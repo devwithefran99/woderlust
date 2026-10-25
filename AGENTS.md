@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Wonderlust
 
-Travel landing page built on the Next.js App Router. There is one route, `app/page.tsx` (currently a stub); its assets are in `public/image/` (`Wanderlast.png`, `Banner.png`, `CTA.png`, …). Only shadcn-generated primitives exist under `components/ui/`; keep that directory CLI-owned and put page sections elsewhere in `components/`.
+Travel landing page built on the Next.js App Router. Routes: `app/page.tsx` (composes `Navbar`, `Banner`, `WhyChoose`); assets in `public/image/` (`Wanderlast.png`, `Banner.png`, `CTA.png`, …). Only shadcn-generated primitives under `components/ui/` are CLI-owned — put page sections in `components/` root.
 
 ## Commands
 
