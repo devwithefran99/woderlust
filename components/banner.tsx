@@ -29,7 +29,8 @@ export function Banner() {
 
         <p className="mt-5 max-w-md text-sm leading-relaxed text-pretty text-white/90 sm:max-w-xl sm:text-base md:mt-6 md:max-w-[820px] md:text-lg">
           Explore breathtaking destinations and create unforgettable memories
-          with our curated travel experiences.
+          with
+          <br className="hidden md:inline" /> our curated travel experiences.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:mt-9">

@@ -46,8 +46,10 @@ export function  AddDestinationForm() {
       headers : {
         'Content-Type' : "application/json"
       },
-      body : JSON.stringify(form)
+      body: JSON.stringify(Object.fromEntries(new FormData(event.currentTarget)))
     })
+    const data = await res.json()
+    console.log(data)
   }
 
   function handleReset() {
