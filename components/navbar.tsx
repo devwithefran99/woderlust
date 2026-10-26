@@ -8,9 +8,10 @@ import { Menu, User, X } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Destinations", href: "#destinations" },
+  { label: "Destinations", href: "/destination" },
+  { label: "Add-Destinations", href: "/add-destination" },
   { label: "My Bookings", href: "#bookings" },
-  { label: "Admin", href: "#admin" },
+
 ];
 
 const authLinks = [
