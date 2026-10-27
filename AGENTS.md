@@ -10,29 +10,39 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Wonderlust
 
-Travel landing page built on the Next.js App Router. Routes: `app/page.tsx` (composes `Navbar`, `Banner`, `WhyChoose`); assets in `public/image/` (`Wanderlast.png`, `Banner.png`, `CTA.png`, …). Only shadcn-generated primitives under `components/ui/` are CLI-owned — put page sections in `components/` root.
+Travel-package site on the Next.js App Router. The UI is a client for a **separate backend at `http://localhost:5000` that is not in this repo** (source: `../wonderlust-server-side`, run with plain `node index.js` — no watcher, so restart it after backend changes or new routes return 404). Without it, `/destination` renders "No destinations yet" and `/destination/[id]` renders the unavailable state. Endpoints used: `GET /destination`, `GET /destination/:id`, `POST /add-destination`, `PATCH /destination/:id`. Records are Mongo-shaped with a 24-hex `_id`; the detail page rejects any other ID with `notFound()`.
 
 ## Commands
 
-Use npm — `package-lock.json` is the only lockfile even though the README lists other package managers.
+Use npm — `package-lock.json` is the only lockfile; the README's yarn/pnpm/bun lines are boilerplate.
 
-- `npm run dev` — Turbopack dev server. If a server is already running, Next 16 exits and prints its URL/PID; use that server instead of killing it.
-- `npm run build` — production build; also runs TypeScript. This is the main verification step.
-- `npx tsc --noEmit` — typecheck only (no npm script). Run `npx next typegen` first if the generated global route types are missing.
-- `npm run lint` — currently fails on 2 pre-existing errors in generated files (`components/ui/carousel.tsx`, `hooks/use-mobile.ts`: `react-hooks/set-state-in-effect`). Do not treat them as regressions or rewrite generated components just to silence them.
-- No test runner, CI, formatter, or env file is configured. Don't invent test commands.
+- `npm run dev` — Turbopack dev server on :3000. A second `next dev` detects the running server, prints its URL/PID, and exits; reuse it or `taskkill /PID <pid> /F` instead of starting another.
+- `npm run build` — production build and the only typecheck. Run it before calling work done.
+- `npx tsc --noEmit` — typecheck only; run `npx next typegen` first if `.next/types` is missing.
+- `npm run lint` — has known `react-hooks/set-state-in-effect` errors in `components/destination-image.tsx`, `components/ui/carousel.tsx`, and `hooks/use-mobile.ts`, plus unused-var warnings. Don't chase these as regressions.
+- No tests, CI, formatter, or env file. Don't invent test commands.
 
-## Stack gotchas
+## Routes and structure
 
-- Next.js 16.4 / React 19.3. Check `node_modules/next/dist/docs/` before using framework APIs; the installed version differs from typical training data.
-- `cacheComponents: true` + `partialPrefetching: true`: PPR/static shells are on, data is dynamic by default, and only the Node runtime is supported. Cache with `"use cache"` plus `cacheLife`/`cacheTag`; put uncached data under `<Suspense>` or set `export const instant = false`. Never add a `runtime` route segment export. See `01-app/01-getting-started/08-caching.md`.
-- Type pages/layouts with the generated globals `PageProps<"/route">`, `LayoutProps<"/">`, and `RouteContext<...>`. They are not imported.
-- Tailwind is v4 and CSS-first: there is no `tailwind.config`. Theme tokens, radii, and fonts live in `app/globals.css` (`@theme inline` plus `:root`/`.dark`).
+- `app/layout.tsx` — root layout, fonts, and the global `Navbar`; pages do not render it.
+- `app/page.tsx` — home: `Banner`, `WhyChoose`, `Testimonials`.
+- `app/destination/page.tsx` — server component, `export const dynamic = "force-dynamic"`, fetches all packages and passes them to the client `DestinationExplorer` (filter/sort UI).
+- `app/destination/[id]/page.tsx` — detail page + `generateMetadata`; `cache()` dedupes the fetch between the two. 404/invalid ID → `notFound()`; fetch failure → "unavailable" screen.
+- `app/add-destination/page.tsx` — `AddDestinationForm`, which POSTs to the backend.
+- Page sections live in `components/` root; only shadcn primitives under `components/ui/` are CLI-owned.
+
+## Conventions and gotchas
+
+- The `Destination` type is exported from `components/destination-explorer.tsx`; import it from there instead of redeclaring.
+- Use `DestinationImage` for API-provided photos: it intentionally uses a raw `<img>` (arbitrary user URLs, falls back to `/image/Banner.png`). Use `next/image` for bundled `/image/*.png` assets.
+- Tailwind v4 is CSS-first: no `tailwind.config`. Brand tokens are `brand`, `brand-dark`, `mist`, and `font-display` (Playfair) in `app/globals.css`.
 - shadcn uses the `base-nova` style on `@base-ui/react` (not Radix) with lucide icons. Add primitives with `npx shadcn add <component>` rather than hand-rolling them.
-- `cn` comes from the `cn` npm package: `lib/utils.ts` only re-exports it, and generated components import `{ cn } from "cn"` directly. Do not install `clsx`/`tailwind-merge` or switch these imports to `@/lib/utils`.
-- `@/*` maps to the repo root (`@/components/ui/button`, `@/hooks/use-mobile`).
-- `next.config.ts` routes `*.css` through `@tailwindcss/turbopack`; keep that rule. `experimental.agentFeedback` is enabled, which is why the managed block below exists.
-- Images are local PNGs; reference them with `next/image` and exact paths such as `/image/Wanderlast.png` (case-sensitive).
+- `cn` is the npm `cn` package; `lib/utils.ts` only re-exports it, and generated components import `{ cn } from "cn"`. Don't add `clsx`/`tailwind-merge`.
+- `@/*` maps to the repo root.
+- `next.config.ts` routes `*.css` through `@tailwindcss/turbopack`; keep that rule. `cacheComponents`/`partialPrefetching` are off, so use the previous model (`force-dynamic`, `cache: "no-store"`), not `"use cache"`/`cacheLife`.
+- `PageProps`, `LayoutProps`, and `RouteContext` are generated globals — do not import them.
+- `images.remotePatterns` allows any HTTPS host; local assets live in `public/image/` and paths are case-sensitive.
+- Next.js 16.4 / React 19.3: check `node_modules/next/dist/docs/` before using framework APIs; the installed version differs from typical training data.
 
 <!-- BEGIN:nextjs-agent-feedback -->
 

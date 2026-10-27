@@ -8,13 +8,14 @@ import {
   Check,
   ChevronLeft,
   MapPin,
-  Pencil,
   Star,
-  Trash2,
+
 } from "lucide-react";
 
 import { DestinationImage } from "@/components/destination-image";
 import type { Destination } from "@/components/destination-explorer";
+import EditDestinationDailog from "@/components/EditDestinationDailog";
+import DeleteDestinationDialog from "@/components/DeleteDestinationDialog";
 
 type DestinationDetails = Destination & {
   reviewCount?: number;
@@ -48,11 +49,7 @@ const bookingPerks = [
   "24/7 customer support",
 ];
 
-const secondaryActionClassName =
-  "inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-[13px] font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300/60 sm:h-10 sm:px-4";
 
-const dangerActionClassName =
-  "inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3 text-[13px] font-medium text-red-500 transition-colors hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200/60 sm:h-10 sm:px-4";
 
 // React cache keeps the page and its metadata from fetching the same trip twice.
 const getDestination = cache(
@@ -149,26 +146,9 @@ export default async function DestinationDetailsPage({
 
           {/* Editing and cancellation will be wired into the booking flow. */}
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              title="Editing is coming soon"
-              className={secondaryActionClassName}
-            >
-              <Pencil
-                className="size-3.5"
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
-              Edit
-            </button>
-            <Link href="/destination" className={dangerActionClassName}>
-              <Trash2
-                className="size-3.5"
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
-              Cancel
-            </Link>
+            <EditDestinationDailog destination ={destination}/>
+            
+           <DeleteDestinationDialog id={id} />
           </div>
         </div>
 
