@@ -17,7 +17,7 @@ const navLinks = [
 const authLinks = [
   { label: "Profile", href: "#profile", icon: true },
   { label: "Login", href: "#login" },
-  { label: "Sign Up", href: "#signup" },
+  { label: "Sign Up", href: "/signup" },
 ];
 
 export function Navbar() {
